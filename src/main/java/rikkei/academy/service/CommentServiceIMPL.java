@@ -5,66 +5,52 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import rikkei.academy.model.Comment;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 import java.util.Date;
 import java.util.List;
 
+@Component
+@Transactional
+@Service
 public class CommentServiceIMPL implements ICommentService {
-
-    private static SessionFactory sessionFactory;
-    private static EntityManager entityManager;
-
-    static {
-        try {
-            sessionFactory = new Configuration().configure("hibernate.conf.xml").buildSessionFactory();
-            entityManager = sessionFactory.createEntityManager();
-        } catch (HibernateException e) {
-            e.printStackTrace();
-        }
-    }
+    @Autowired
+    private ICommentService commentService;
+    @PersistenceContext
+    private EntityManager em;
 
     @Override
     public List<Comment> findAll() {
-        String queryStr = "select c from Comment as c where c.date = :date";
-        TypedQuery<Comment> query = entityManager.createQuery(queryStr, Comment.class);
-        query.setParameter("date", new Date(), TemporalType.DATE);
+        TypedQuery<Comment> query = em.createQuery("SELECT C FROM Comment C", Comment.class);
+
         return query.getResultList();
     }
 
     @Override
     public void save(Comment comment) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            if (comment.getId() != 0) {
-                Comment comment1 = findById(comment.getId());
-                comment1.setRate(comment.getRate());
-                comment1.setAuthor(comment.getAuthor());
-                comment1.setFeedback(comment.getFeedback());
-                comment1.setLikeCount(comment.getLikeCount());
-                comment1.setDate(comment.getDate());
-            }
-            session.saveOrUpdate(comment);
-            transaction.commit();
-        } catch (Exception e) {
-            e.printStackTrace();
-            if (transaction != null) {
-                transaction.rollback();
-            }
+        if (comment.getId() == null) {
+            em.persist(comment);
+
+        } else {
+            em.merge(comment);
         }
+
     }
 
     @Override
     public Comment findById(int id) {
-        String queryStr = "select c from Comment as c where c.id = :id";
-        TypedQuery<Comment> query = entityManager.createQuery(queryStr, Comment.class);
+        TypedQuery<Comment> query = em.createQuery("SELECT C FROM Comment C WHERE C.id = :id", Comment.class);
         query.setParameter("id", id);
         return query.getSingleResult();
     }
+
 
 }

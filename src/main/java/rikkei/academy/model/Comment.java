@@ -10,11 +10,11 @@ import java.util.Date;
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-    private int rate;
+    private Integer id;
+    private Integer rate;
     private String author;
     private String feedback;
-    private int likeCount;
+    private Integer likeCount;
     @Temporal(TemporalType.DATE)
     @CreationTimestamp
     private Date date;
@@ -22,7 +22,7 @@ public class Comment {
     public Comment() {
     }
 
-    public Comment(int id, int rate, String author, String feedback, int likeCount, Date date) {
+    public Comment(Integer id, Integer rate, String author, String feedback, Integer likeCount, Date date) {
         this.id = id;
         this.rate = rate;
         this.author = author;
@@ -31,7 +31,7 @@ public class Comment {
         this.date = date;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -39,7 +39,7 @@ public class Comment {
         this.id = id;
     }
 
-    public int getRate() {
+    public Integer getRate() {
         return rate;
     }
 
@@ -63,7 +63,7 @@ public class Comment {
         this.feedback = feedback;
     }
 
-    public int getLikeCount() {
+    public Integer getLikeCount() {
         return likeCount;
     }
 
@@ -79,17 +79,7 @@ public class Comment {
         this.date = date;
     }
 
-    @Override
-    public Comment clone() {
-        Comment comment = new Comment();
-        comment.setId(id);
-        comment.setDate(date);
-        comment.setFeedback(feedback);
-        comment.setRate(rate);
-        comment.setAuthor(author);
-        comment.setLikeCount(likeCount);
-        return comment;
-    }
+
 
 
     @Override
